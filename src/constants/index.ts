@@ -1,4 +1,22 @@
-import { TextStyle } from "pixi.js";
+import { Container, Graphics, TextStyle, Text } from "pixi.js";
+
+import { AbstractGameScene } from "../Scene/Scene";
+
+
+export enum BUTTON_STATE {
+    ENABLE,
+    DISABLE,
+}
+export interface ChestButton {
+    index: number,
+    graphic: Graphics,
+    text: Text,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    isPressed: boolean
+}
 
 const BUTTON_PLAY_DISABLE_STYLE = new TextStyle({
     fontFamily: 'Arial',
@@ -40,4 +58,33 @@ export const CONSTANTS = {
     CHEST_COLOR: 0x999fdf,
     BUTTON_PLAY_ENABLE_STYLE,
     BUTTON_PLAY_DISABLE_STYLE,
+}
+
+export interface SceneTransition {
+    init(type: TransitionType, sceneContainer: Container): void
+    update(delta: number, callback: () => void): void
+}
+
+export enum TransitionType {
+    FADE_OUT = 'hide_mask',
+    FADE_IN = 'shiw_mask'
+}
+
+export interface GameScene {
+    sceneUpdate(delta: number): void
+}
+
+export enum SceneState {
+    LOAD,
+    PROCESS,
+    FINALIZE,
+    DONE
+}
+
+export interface SceneSettings {
+    index: number;
+    name?: string,
+    gameScene: AbstractGameScene;
+    fadeInTransition: SceneTransition;
+    fadeOutTransition: SceneTransition;
 }
