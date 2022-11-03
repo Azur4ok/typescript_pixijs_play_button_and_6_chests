@@ -88,3 +88,9 @@ export interface SceneSettings {
     fadeInTransition: SceneTransition;
     fadeOutTransition: SceneTransition;
 }
+
+export interface ResultData {
+    chestWin: number
+    bonusWin: number
+    totalWin: number
+}

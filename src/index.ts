@@ -1,10 +1,11 @@
-import { Application, Container, Graphics, Text } from 'pixi.js'
-import { Game } from './Game'
-import { CONSTANTS, TransitionType } from './constants'
+import { Application } from 'pixi.js'
 
+import { Game } from './Game'
+import { TransitionType } from './constants'
 import { MainScene } from './Scene/MainScene'
 import { SimpleFadeTransition } from './Transition'
-import { BonusScene } from './Scene/BonuScene/index';
+import { BonusScene } from './Scene/BonuScene';
+
 
 const app = new Application({
     width: window.innerWidth,
@@ -15,14 +16,10 @@ const app = new Application({
 })
 
 app.stage.interactive = true
-const playButton = new Graphics()
-
-const container = new Container()
 
 document.body.appendChild(app.view)
 
 function setup(): void {
-    const mainScene = new MainScene(app)
     const game = new Game(app, [
         {
             index: 0,

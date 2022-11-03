@@ -1,12 +1,14 @@
 import { Application, Container, Graphics, Text } from "pixi.js";
 
 import { BUTTON_STATE, ChestButton, CONSTANTS } from '../../constants/index';
+import { RandomChestController } from "../../RandomChestController";
 import { AbstractGameScene } from "../Scene";
 
 export class MainScene extends AbstractGameScene {
     private chests: ChestButton[] = []
-    private playButton: Graphics
+    private playButton: Graphics = new Graphics
     private playText: Text = new Text('')
+    private currentChest: Text = new Text('')
     private WIDTH: number
     private HEIGHT: number
 
@@ -16,19 +18,20 @@ export class MainScene extends AbstractGameScene {
         this.WIDTH = app.screen.width
         this.HEIGHT = app.screen.height
 
-        this.playButton = this.setupPlayButton()
+        this.setupPlayButton()
+        this.addAllListeners()
     }
 
-
-    setup(sceneContainer: Container) {
+    setup(sceneContainer: Container): void {
         this.sceneContainer = sceneContainer
         this.sceneContainer.addChild(this.playButton)
         for (let i = 0; i < CONSTANTS.NUMBER_CHESTS; i++) {
             this.sceneContainer.addChild(this.chests[i].graphic)
         }
+        this.reset()
     }
 
-    setupPlayButton() {
+    setupPlayButton(): void {
         this.playButton = new Graphics()
         this.playButton.buttonMode = true
         this.playText = new Text("PLAY", CONSTANTS.BUTTON_PLAY_ENABLE_STYLE)
@@ -36,13 +39,11 @@ export class MainScene extends AbstractGameScene {
         this.playText.y = this.HEIGHT - (this.playButton.height + (this.playText.height * 2))
         this.playText.buttonMode = true
         this.playButton.addChild(this.playText)
-        this.drawPlayButton()
+        this.setPlayButtonState(BUTTON_STATE.ENABLE)
         this.drawChestsButtons()
-
-        return this.playButton
     }
 
-    drawPlayButton() {
+    drawPlayButton(): void {
         this.playButton.beginFill(0xcccc, 1)
         this.playButton.drawRect(
             0,
@@ -53,7 +54,7 @@ export class MainScene extends AbstractGameScene {
         this.playButton.endFill()
     }
 
-    setPlayState(state: BUTTON_STATE) {
+    setPlayButtonState(state: BUTTON_STATE): void {
         switch (state) {
             case BUTTON_STATE.ENABLE:
                 this.drawPlayButton();
@@ -68,7 +69,7 @@ export class MainScene extends AbstractGameScene {
         }
     }
 
-    drawChestsButtons() {
+    drawChestsButtons(): void {
         for (let i = 0; i < CONSTANTS.NUMBER_CHESTS; i++) {
             const graphic = new Graphics()
             const x = ((i + 1) % 2 ? Math.round((this.WIDTH - 1) / 2) : 0)
@@ -89,18 +90,60 @@ export class MainScene extends AbstractGameScene {
         }
     }
 
-    drawChestButton(index: number) {
+    drawChestButton(index: number): void {
         this.chests[index].graphic.beginFill(CONSTANTS.CHEST_COLOR, 1)
         this.chests[index].graphic.drawRect(this.chests[index].x, this.chests[index].y, this.chests[index].width, this.chests[index].height)
         this.chests[index].graphic.endFill()
     }
 
+    addAllListeners(): void {
+        this.addChestsListener()
+        this.playButton.addListener("pointerdown", () => {
+            this.setPlayButtonState(BUTTON_STATE.DISABLE)
+            for (let i = 0; i < CONSTANTS.NUMBER_CHESTS; i++) {
+                this.chests[i].isPressed = false
+                this.chests[i].graphic.interactive = true
+                this.chests[i].text.style = CONSTANTS.BUTTON_PLAY_ENABLE_STYLE
+            }
+        })
+    }
+
+    addChestsListener(): void {
+        for (let i = 0; i < CONSTANTS.NUMBER_CHESTS; i++) {
+            this.chests[i].graphic.addListener('pointerdown', () => {
+                this.chests[i].isPressed = true
+                this.checkWin(i)
+            })
+        }
+    }
+
+    checkWin(index: number) {
+        const result = RandomChestController.play()
+
+        this.chests[index].text.text = String(result.totalWin)
+
+        this.currentChest = this.chests[index].text
+
+        if (result.bonusWin) {
+            this.chests[index].text.text = `${this.chests[index].text.text} + Bonus win ${String(result.bonusWin)}`
+        }
+    }
+
     sceneUpdate(delta: number): void {
-        throw new Error("Method not implemented.");
+        if (RandomChestController.getCurrentData().bonusWin) {
+            this.sceneSwitcher('bonusScene')
+        }
     }
 
     reset() {
-        this.playText.style = CONSTANTS.BUTTON_PLAY_ENABLE_STYLE
+        this.setPlayButtonState(BUTTON_STATE.ENABLE)
+
+        for (let i = 0; i < CONSTANTS.NUMBER_CHESTS; i++) {
+            this.chests[i].isPressed = false
+            this.chests[i].text.style = CONSTANTS.BUTTON_PLAY_DISABLE_STYLE
+            this.chests[i].graphic.interactive = false
+            this.chests[i].text.text = "Chest"
+        }
     }
 
     preTransitionUpdate(delta: number): void {

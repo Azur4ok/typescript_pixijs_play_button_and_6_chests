@@ -18,10 +18,8 @@ export class Game {
             sceneSettings.gameScene.init(this.app, this.sceneSwitcher)
         })
 
-        this.mainScene = scenes[0]
+        this.currentScene = this.mainScene = scenes[0]
         this.bonusScene = scenes[1]
-
-        this.currentScene = this.mainScene
 
         this.setupScene(this.currentScene)
     }
@@ -40,13 +38,6 @@ export class Game {
             }
         });
     }
-
-    // createScene(sceneSettings: SceneSettings) {
-    //     const gameScene: AbstractGameScene = sceneSettings.gameScene
-    //     const sceneContainer = gameScene.getSceneContainer()
-    //     gameScene.setup(sceneContainer)
-    //     this.app.stage.addChild(sceneContainer)
-    // }
 
     setupScene(sceneSettings: SceneSettings) {
         this.app.stage.removeChildren();
