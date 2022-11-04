@@ -3,16 +3,15 @@ import { Application } from 'pixi.js'
 import { Game } from './Game'
 import { TransitionType } from './constants'
 import { MainScene } from './Scene/MainScene'
+import { BonusScene } from './Scene/BonuScene'
 import { SimpleFadeTransition } from './Transition'
-import { BonusScene } from './Scene/BonuScene';
-
 
 const app = new Application({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    resolution: window.devicePixelRatio || 1,
-    backgroundColor: 0x100ab,
-    antialias: true
+  width: window.innerWidth,
+  height: window.innerHeight,
+  resolution: window.devicePixelRatio || 1,
+  backgroundColor: 0x100ab,
+  antialias: true,
 })
 
 app.stage.interactive = true
@@ -20,26 +19,29 @@ app.stage.interactive = true
 document.body.appendChild(app.view)
 
 function setup(): void {
-    const game = new Game(app, [
-        {
-            index: 0,
-            name: "mainScene",
-            gameScene: new MainScene(app),
-            fadeInTransition: new SimpleFadeTransition(app, TransitionType.FADE_IN, 0.1),
-            fadeOutTransition: new SimpleFadeTransition(app, TransitionType.FADE_OUT, .1)
-        },
-        {
-            index: 1,
-            name: "bonusScene",
-            gameScene: new BonusScene(app),
-            fadeInTransition: new SimpleFadeTransition(app, TransitionType.FADE_IN, 0.1),
-            fadeOutTransition: new SimpleFadeTransition(app, TransitionType.FADE_OUT, .1)
-        }]);
+  const mainScene = new MainScene(app)
+  const bonusScene = new BonusScene(app)
 
-    app.ticker.add((delta) => {
-        game.update(delta)
-    })
+  const game = new Game(app, [
+    {
+      index: 0,
+      name: 'mainScene',
+      gameScene: mainScene,
+      fadeInTransition: new SimpleFadeTransition(app, TransitionType.FADE_IN, 0.1),
+      fadeOutTransition: new SimpleFadeTransition(app, TransitionType.FADE_OUT, 0.1),
+    },
+    {
+      index: 1,
+      name: 'bonusScene',
+      gameScene: bonusScene,
+      fadeInTransition: new SimpleFadeTransition(app, TransitionType.FADE_IN, 0.1),
+      fadeOutTransition: new SimpleFadeTransition(app, TransitionType.FADE_OUT, 0.1),
+    },
+  ])
+
+  app.ticker.add((delta) => {
+    game.update(delta)
+  })
 }
 
 window.onload = setup
-

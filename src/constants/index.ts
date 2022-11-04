@@ -67,7 +67,7 @@ export interface SceneTransition {
 
 export enum TransitionType {
     FADE_OUT = 'hide_mask',
-    FADE_IN = 'shiw_mask'
+    FADE_IN = 'show_mask'
 }
 
 export interface GameScene {
@@ -83,7 +83,7 @@ export enum SceneState {
 
 export interface SceneSettings {
     index: number;
-    name?: string,
+    name: string,
     gameScene: AbstractGameScene;
     fadeInTransition: SceneTransition;
     fadeOutTransition: SceneTransition;
